@@ -1,0 +1,8 @@
+{
+  "short_name": "react-gantt-chart",
+  "name": "react-gantt-chart",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
