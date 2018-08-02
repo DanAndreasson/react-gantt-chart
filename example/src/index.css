@@ -3,3 +3,9 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.row {
+  grid-column: 1 / span 30;
+  background-color: red;
+  overflow: hidden;
+}
