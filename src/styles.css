@@ -1,6 +1,8 @@
 .container {
   display: grid;
-  background-color: #ecf0f1;
+  /* background-color: #000000; */
   grid-auto-flow: row dense;
+  grid-gap: 0.5rem 0;
   margin: 2rem;
+  background-color: #ecf0f1;
 }

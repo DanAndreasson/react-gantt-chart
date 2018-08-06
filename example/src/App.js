@@ -1,40 +1,52 @@
 import React, { Component } from "react"
 
 import Gantt from "react-gantt-chart"
+import poser, { PoseGroup } from "react-pose"
+import { format, addDays } from "date-fns"
+import cx from "classnames"
+
+function randomDate(start, end) {
+  return new Date(+start + Math.random() * (end - start))
+}
 
 class Row extends Component {
   render() {
-    const { project, startsAt, endsAt, options } = this.props
+    const { id, startsBeforePeriod } = this.props
 
-    console.log(options)
-
-    return (
-      <div className={"row"} style={options}>
-        {project.name}. {startsAt}. {endsAt}
-      </div>
-    )
+    console.log(`Row with ID ${id} rendered`)
+    return <div className={cx("row", { "row-early": startsBeforePeriod })} />
   }
 }
 
+const Item = poser.div({
+  enter: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.5 },
+})
+
 export default class App extends Component {
   state = {
+    periodStartsAt: "2018-01-01",
+    periodEndsAt: "2018-12-31",
     startsAt: "2018-01-01",
     endsAt: "2018-12-01",
     name: "",
-    items: [
-      {
-        id: 1,
-        project: { name: "Doorling" },
-        startsAt: "2018-03-01",
-        endsAt: "2018-07-01",
-      },
-      {
-        id: 2,
-        project: { name: "SpiderAds 2.0" },
-        startsAt: "2018-01-01",
-        endsAt: "2018-01-31",
-      },
-    ],
+    items: Array.apply(null, { length: 50 })
+      .map(Number.call, Number)
+      .map(i => {
+        const startsAt = randomDate(
+          new Date(2018, 0, 1),
+          new Date(2018, 12, 30)
+        )
+
+        const endsAt = randomDate(addDays(startsAt, 1), new Date(2018, 12, 31))
+
+        return {
+          id: i,
+          project: { name: `Project ${i}` },
+          startsAt: format(startsAt, "yyyy-MM-dd"),
+          endsAt: format(endsAt, "yyyy-MM-dd"),
+        }
+      }),
   }
 
   addItem = item => this.setState({ items: [...this.state.items, item] })
@@ -55,7 +67,14 @@ export default class App extends Component {
   }
 
   render() {
-    const { name, startsAt, endsAt, items } = this.state
+    const {
+      periodEndsAt,
+      periodStartsAt,
+      name,
+      startsAt,
+      endsAt,
+      items,
+    } = this.state
 
     return (
       <div>
@@ -82,14 +101,41 @@ export default class App extends Component {
           <input type="submit" value="Add project" />
         </form>
 
-        <Gantt
-          renderItem={(item, options) => (
-            <Row key={item.id} {...item} options={options} />
+        <div>
+          <label>
+            <span>Period Stars at</span>
+            <input
+              onChange={this.handleChange}
+              name="periodStartsAt"
+              value={periodStartsAt}
+            />
+          </label>
+
+          <label>
+            <span>Period Ends at</span>
+            <input
+              onChange={this.handleChange}
+              name="periodEndsAt"
+              value={periodEndsAt}
+            />
+          </label>
+        </div>
+
+        <Gantt startsAt={periodStartsAt} endsAt={periodEndsAt}>
+          {getItemProps => (
+            <PoseGroup>
+              {items.map(item => {
+                const itemProps = getItemProps(item)
+
+                return (
+                  <Item key={item.id} style={itemProps.style}>
+                    <Row {...item} {...itemProps} />
+                  </Item>
+                )
+              })}
+            </PoseGroup>
           )}
-          items={items}
-          startsAt="2018-01-01"
-          endsAt="2019-12-31"
-        />
+        </Gantt>
       </div>
     )
   }

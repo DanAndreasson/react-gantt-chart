@@ -5,7 +5,8 @@ body {
 }
 
 .row {
-  grid-column: 1 / span 30;
-  background-color: red;
+  /* border-top: 3px solid #3498db; */
+  background-color: #2ecc71;
   overflow: hidden;
+  height: 5px;
 }
